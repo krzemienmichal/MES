@@ -10,8 +10,6 @@ class Node:
 class Element:
     id = []
 
-    # def __init__(self, n, nH):
-
 
 class Grid:
     h = 0.2
