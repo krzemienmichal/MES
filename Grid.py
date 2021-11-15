@@ -9,6 +9,7 @@ class Node:
 
 class Element:
     id = []
+    H = []
 
     def __init__(self, ids):
         self.id = ids
@@ -17,12 +18,11 @@ class Element:
         return  self.id;
 
 
-
 class Grid:
     h = 0.2
     b = 0.1
     nH = 5
-    nB = 6
+    nB = 4
     nN = nH*nB
     nE = (nH-1)*(nB-1)
     nodes = []
@@ -53,6 +53,6 @@ class Grid:
 
 if __name__ == '__main__':
     a = Grid()
-    # a.print_nodes()
+    a.print_nodes()
     a.print_elements()
 
