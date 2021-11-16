@@ -81,6 +81,7 @@ class HMatrix:
 
 
 if __name__ == "__main__":
+
     npc = 3
 
     # grid = [[0, 0], [0.025, 0], [0.025, 0.025], [0, 0.025]]
@@ -97,14 +98,3 @@ if __name__ == "__main__":
             hmatrix.count_h_matrix(j, jakobian.jacobianInverse, element)
             grid.elements[i].H = hmatrix.solve_H_matrix(grid.elements[i].H)
         print(grid.elements[i].H)
-        # print(hmatrix.dNdXT)
-        # for item in grid.elements[i].H:
-        #     print(item)
-
- # for item, k in zip(hmatrix.solve_H_matrix(2), range(4)):
-        #     for i in range(len(item)):
-        #         H[k][i] += item[i]
-        # H = hmatrix.solve_H_matrix(H)
-        # grid.elements[i].H = hmatrix.solve_H_matrix(npc)
-        # for item in hmatrix.dNdX:
-        #     print(item)
