@@ -45,52 +45,43 @@ class HMatrix:
     dNdYT = []
 
     def __init__(self, npc):
-        self.dNdX = [[0 for _ in range(4)] for _ in range(pow(npc, 2))]
-        self.dNdY = [[0 for _ in range(4)] for _ in range(pow(npc, 2))]
-        self.dNdXT = [[0 for _ in range(4)] for _ in range(pow(npc, 2))]
-        self.dNdYT = [[0 for _ in range(4)] for _ in range(pow(npc, 2))]
+        self.dNdX = [0 for _ in range(4)]
+        self.dNdY = [0 for _ in range(4)]
+        self.dNdXT = [[0] for _ in range(pow(npc, 2))]
+        self.dNdYT = [[0] for _ in range(pow(npc, 2))]
 
     def count_h_matrix(self, j, jacobianInverse, element: Element.Element4_2D):
         for i in range(4):
-            self.dNdX[j][i] = jacobianInverse[0][0] * element.dNdE[j][i] + jacobianInverse[0][1] * element.dNdN[j][i]
-            self.dNdY[j][i] = jacobianInverse[1][0] * element.dNdE[j][i] + jacobianInverse[1][1] * element.dNdN[j][i]
+            self.dNdX[i] = jacobianInverse[0][0] * element.dNdE[j][i] + jacobianInverse[0][1] * element.dNdN[j][i]
+            self.dNdY[i] = jacobianInverse[1][0] * element.dNdE[j][i] + jacobianInverse[1][1] * element.dNdN[j][i]
 
     def matrix_transpose(self):
         for i in range(4):
-            for j in range(4):
-                self.dNdXT[j][i] = self.dNdX[i][j]
-                self.dNdYT[j][i] = self.dNdY[i][j]
+            self.dNdXT[i][0] = self.dNdX[i]
+            self.dNdYT[i][0] = self.dNdY[i]
 
-    def solve_H_matrix(self, npc):
+    def solve_H_matrix(self, matrix):
         self.matrix_transpose()
         raw_h_matrix = []
         a = 0
         b = 0
         temp2 = []
-        for i in range(pow(npc, 4)):
+        for i in range(4):
             tmp = []
             for j in range(4):
-                temp = 30 * (hmatrix.dNdX[a][b] * hmatrix.dNdXT[j][a] + hmatrix.dNdY[a][b] * hmatrix.dNdYT[j][
-                    a]) * jakobian.detJ
+                temp = 30 * (hmatrix.dNdX[i] * hmatrix.dNdXT[j][a] + hmatrix.dNdY[i] * hmatrix.dNdYT[j][
+                    0]) * jakobian.detJ
                 tmp.append(temp)
             temp2.append(tmp)
-            b += 1
-            if b > 3:
-                b = 0
-                a += 1
-                raw_h_matrix.append(temp2)
-                temp2 = []
-        hfinal = [[0 for _ in range(4)] for _ in range(4)]
-        for item in raw_h_matrix:
-            for i in range(len(item)):
-                for j in range(len(item)):
-                    hfinal[i][j] += item[i][j]
+        for item, i in zip(temp2,range(4)):
+            for j in range(len(item)):
+                matrix[i][j] += item[j]
 
-        return hfinal
+        return matrix
 
 
 if __name__ == "__main__":
-    npc = 2
+    npc = 3
 
     # grid = [[0, 0], [0.025, 0], [0.025, 0.025], [0, 0.025]]
     grid = Grid.Grid()
@@ -100,16 +91,20 @@ if __name__ == "__main__":
     hmatrix = HMatrix(npc)
     for i in range(grid.nE):
         print(grid.elements[i].id[0])
+        grid.elements[i].H = [[0 for _ in range(4)]for _ in range(4)]
         for j in range(pow(element.npc, 2)):
             jakobian.solveJacobian(i, j, grid, element)
-            # print(jakobian.jacobian[0])
-            # print(jakobian.jacobian[1])
-            # print("Inverse")
-            # print(jakobian.jacobianInverse[0])
-            # print(jakobian.jacobianInverse[1])
             hmatrix.count_h_matrix(j, jakobian.jacobianInverse, element)
-        grid.elements[i].H = hmatrix.solve_H_matrix(npc)
+            grid.elements[i].H = hmatrix.solve_H_matrix(grid.elements[i].H)
         print(grid.elements[i].H)
+        # print(hmatrix.dNdXT)
+        # for item in grid.elements[i].H:
+        #     print(item)
 
-
-
+ # for item, k in zip(hmatrix.solve_H_matrix(2), range(4)):
+        #     for i in range(len(item)):
+        #         H[k][i] += item[i]
+        # H = hmatrix.solve_H_matrix(H)
+        # grid.elements[i].H = hmatrix.solve_H_matrix(npc)
+        # for item in hmatrix.dNdX:
+        #     print(item)
