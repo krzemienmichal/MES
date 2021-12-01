@@ -47,8 +47,8 @@ class HMatrix:
     def __init__(self, npc):
         self.dNdX = [0 for _ in range(4)]
         self.dNdY = [0 for _ in range(4)]
-        self.dNdXT = [[0] for _ in range(pow(npc, 2))]
-        self.dNdYT = [[0] for _ in range(pow(npc, 2))]
+        self.dNdXT = [[0] for _ in range(4)]
+        self.dNdYT = [[0] for _ in range(4)]
 
     def count_h_matrix(self, j, jacobianInverse, element: Element.Element4_2D):
         for i in range(4):
@@ -60,17 +60,14 @@ class HMatrix:
             self.dNdXT[i][0] = self.dNdX[i]
             self.dNdYT[i][0] = self.dNdY[i]
 
-    def solve_H_matrix(self, matrix):
+    def solve_H_matrix(self, matrix, element:Element.Element4_2D, k):
         self.matrix_transpose()
-        raw_h_matrix = []
-        a = 0
-        b = 0
         temp2 = []
         for i in range(4):
             tmp = []
             for j in range(4):
-                temp = 30 * (hmatrix.dNdX[i] * hmatrix.dNdXT[j][a] + hmatrix.dNdY[i] * hmatrix.dNdYT[j][
-                    0]) * jakobian.detJ
+                temp = 30 * (hmatrix.dNdX[i] * hmatrix.dNdXT[j][0] + hmatrix.dNdY[i] * hmatrix.dNdYT[j][
+                    0]) * element.wages[k] * jakobian.detJ
                 tmp.append(temp)
             temp2.append(tmp)
         for item, i in zip(temp2,range(4)):
@@ -82,7 +79,7 @@ class HMatrix:
 
 if __name__ == "__main__":
 
-    npc = 3
+    npc = 2
 
     # grid = [[0, 0], [0.025, 0], [0.025, 0.025], [0, 0.025]]
     grid = Grid.Grid()
@@ -90,11 +87,18 @@ if __name__ == "__main__":
     # for i in range(len(grid)):
     jakobian = Jacobian()
     hmatrix = HMatrix(npc)
+    # H = [[0 for _ in range(4)] for _ in range(4)]
     for i in range(grid.nE):
         print(grid.elements[i].id[0])
         grid.elements[i].H = [[0 for _ in range(4)]for _ in range(4)]
         for j in range(pow(element.npc, 2)):
-            jakobian.solveJacobian(i, j, grid, element)
+            jakobian.solveJacobian(0, j, grid, element)
             hmatrix.count_h_matrix(j, jakobian.jacobianInverse, element)
-            grid.elements[i].H = hmatrix.solve_H_matrix(grid.elements[i].H)
-        print(grid.elements[i].H)
+            print(jakobian.jacobian)
+            grid.elements[i].H = hmatrix.solve_H_matrix(grid.elements[i].H, element, j)
+
+            # H = hmatrix.solve_H_matrix(H)
+        print()
+        for item in grid.elements[i].H:
+            print(item)
+        print()
