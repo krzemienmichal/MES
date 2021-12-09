@@ -1,4 +1,6 @@
+import Agregation
 import Element
+import GlobalData
 import Grid
 
 
@@ -66,7 +68,7 @@ class HMatrix:
         for i in range(4):
             tmp = []
             for j in range(4):
-                temp = 30 * (hmatrix.dNdX[i] * hmatrix.dNdXT[j][0] + hmatrix.dNdY[i] * hmatrix.dNdYT[j][
+                temp = GlobalData.GlobalData.conductivity * (self.dNdX[i] * self.dNdXT[j][0] + self.dNdY[i] * self.dNdYT[j][
                     0]) * element.wages[k] * jakobian.detJ
                 tmp.append(temp)
             temp2.append(tmp)
@@ -79,7 +81,7 @@ class HMatrix:
 
 if __name__ == "__main__":
 
-    npc = 2
+    npc = 3
 
     # grid = [[0, 0], [0.025, 0], [0.025, 0.025], [0, 0.025]]
     grid = Grid.Grid()
@@ -89,12 +91,12 @@ if __name__ == "__main__":
     hmatrix = HMatrix(npc)
     # H = [[0 for _ in range(4)] for _ in range(4)]
     for i in range(grid.nE):
-        print(grid.elements[i].id[0])
+        # print(grid.elements[i].id[0])
         grid.elements[i].H = [[0 for _ in range(4)]for _ in range(4)]
         for j in range(pow(element.npc, 2)):
             jakobian.solveJacobian(0, j, grid, element)
             hmatrix.count_h_matrix(j, jakobian.jacobianInverse, element)
-            print(jakobian.jacobian)
+            # print(jakobian.jacobian)
             grid.elements[i].H = hmatrix.solve_H_matrix(grid.elements[i].H, element, j)
 
             # H = hmatrix.solve_H_matrix(H)
@@ -102,3 +104,7 @@ if __name__ == "__main__":
         for item in grid.elements[i].H:
             print(item)
         print()
+
+    agg =  Agregation.Agregation(grid)
+    agg.aggregateMatrix()
+
