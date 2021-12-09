@@ -19,11 +19,15 @@ class Element:
     H = []
     Hbc = []
     P = []
+    C = []
+    SummedMatrix = []
 
     def __init__(self, ids):
         self.id = ids
         self.Hbc = [[0 for _ in range(4)] for _ in range(4)]
         self.P = [0 for _ in range(4)]
+        self.C = [[0 for _ in range(4)] for _ in range(4)]
+        self.SummedMatrix = [[] for _ in range(4)]
 
     def getID(self):
         return  self.id

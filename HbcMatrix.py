@@ -71,7 +71,7 @@ if __name__ == "__main__":
     #         [0.025,0.025],
     #         [0,0.025]]
     data = Grid.Grid()
-    a = HbcSolver(data, 3)
+    a = HbcSolver(data, 2)
     for i in range(data.nE):
         a.solveHbc(data.elements[i])
         # for matrix in data.elements[i].Hbc:

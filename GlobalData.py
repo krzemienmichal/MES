@@ -5,3 +5,4 @@ class GlobalData:
     specific_heat = 700
     simultaion_step_time = 50 #krok czasowy 50s
     initial_temperature = 100
+    density = 7800

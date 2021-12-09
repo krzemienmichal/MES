@@ -17,13 +17,14 @@ class Element4_2D:
         self.points = [[0 for _ in range(2)] for _ in range(pow(npc, 2))]
         self.borderPoints = [[[0 for _ in range(2)] for _ in range(npc)] for _ in range(4)]
         self.N = [[0 for _ in range(4)] for _ in range(pow(npc,2))]
+
         param = Parameters(npc)
         for i in range(npc):
             for j in range(npc):
                 self.points[i * npc + j][0] = param.points[j]
                 self.points[i * npc + j][1] = param.points[i]
                 self.wages.append(param.wages[j]*param.wages[i])
-
+        self.countNmatrix(self.N, self.points)
         for i in range(4):
             for j in range(npc):
                 if i == 0:
@@ -49,6 +50,8 @@ class Element4_2D:
             self.dNdN[i][1] = -0.25 * (1 + self.points[i][0])
             self.dNdN[i][2] = 0.25 * (1 + self.points[i][0])
             self.dNdN[i][3] = 0.25 * (1 - self.points[i][0])
+
+
 
     def countNmatrix(self, N, points):
         for i in range(len(N)):

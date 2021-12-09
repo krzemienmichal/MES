@@ -2,6 +2,7 @@ import Agregation
 import Element
 import GlobalData
 import Grid
+import HbcMatrix
 
 
 class Jacobian:
@@ -79,6 +80,15 @@ class HMatrix:
         return matrix
 
 
+class Cmatrix:
+
+    def solveCmatrix(self, matrix, element:Element.Element4_2D, k):
+        for i in range(4):
+            for j in range(4):
+                matrix[i][j] += GlobalData.GlobalData.specific_heat*GlobalData.GlobalData.density * element.N[k][i] * \
+                                element.N[k][j] * element.wages[k] * jakobian.detJ
+
+
 if __name__ == "__main__":
 
     npc = 3
@@ -89,6 +99,7 @@ if __name__ == "__main__":
     # for i in range(len(grid)):
     jakobian = Jacobian()
     hmatrix = HMatrix(npc)
+    cmatrix = Cmatrix()
     # H = [[0 for _ in range(4)] for _ in range(4)]
     for i in range(grid.nE):
         # print(grid.elements[i].id[0])
@@ -98,13 +109,35 @@ if __name__ == "__main__":
             hmatrix.count_h_matrix(j, jakobian.jacobianInverse, element)
             # print(jakobian.jacobian)
             grid.elements[i].H = hmatrix.solve_H_matrix(grid.elements[i].H, element, j)
+            cmatrix.solveCmatrix(grid.elements[i].C, element, j)
 
             # H = hmatrix.solve_H_matrix(H)
         print()
         for item in grid.elements[i].H:
             print(item)
         print()
+        print("Cmatrix")
+        print(grid.elements[i].id)
+        for C in grid.elements[i].C:
+            print(C)
+
+        print()
+
+    a = HbcMatrix.HbcSolver(grid, 3)
+    for i in range(grid.nE):
+        a.solveHbc(grid.elements[i])
 
     agg =  Agregation.Agregation(grid)
     agg.aggregateMatrix()
+    print()
+    print()
+
+    for matrixH in agg.H:
+        print(matrixH)
+    print()
+
+    for matrixC in agg.C:
+        print(matrixC)
+    print()
+
 
