@@ -1,4 +1,6 @@
 import math
+import numbers
+
 
 class Node:
     x = None
@@ -27,23 +29,30 @@ class Element:
         self.Hbc = [[0 for _ in range(4)] for _ in range(4)]
         self.P = [0 for _ in range(4)]
         self.C = [[0 for _ in range(4)] for _ in range(4)]
+        self.H = [[0 for _ in range(4)] for _ in range(4)]
         self.SummedMatrix = [[] for _ in range(4)]
 
     def getID(self):
-        return  self.id
+        return self.id
 
 
 class Grid:
-    h = 0.1
-    b = 0.1
-    nH = 4
-    nB = 4
-    nN = nH*nB
-    nE = (nH-1)*(nB-1)
+    h = None
+    b = None
+    nH = None
+    nB = None
+    nN = None
+    nE = None
     nodes = []
     elements = []
 
-    def __init__(self):
+    def __init__(self, h: float, b: float, nH: int, nB: int):
+        self.h = h
+        self.b = b
+        self.nH = nH
+        self.nB = nB
+        self.nN = nH*nB
+        self.nE = (nH-1)*(nB-1)
         self.nodes = [Node(x=i*(self.b/(self.nB-1)), y=j*self.h/(self.nH-1))
                       for i in range(self.nB) for j in range(self.nH)]
         self.generate_elements()

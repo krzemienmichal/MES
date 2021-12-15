@@ -1,4 +1,5 @@
 class GlobalData:
+    iterations = 10
     alpha = 300
     conductivity = 25
     temperature = 1200

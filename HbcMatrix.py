@@ -1,6 +1,6 @@
 import math
 
-import Element
+import Element4_2D
 import GlobalData
 import Grid
 import Parameters
@@ -12,7 +12,7 @@ class HbcSolver():
     sides = None
 
     def __init__(self, data:Grid.Grid ,npc:int):
-        self.uni_ele = Element.Element4_2D(npc)
+        self.uni_ele = Element4_2D.Element4_2D(npc)
         self.data = data
         self.sides = []
 
@@ -29,7 +29,6 @@ class HbcSolver():
         #     else:
         #         self.sides.append([self.data[i], self.data[i+1]])
         #
-        print(grid.id)
         for i in range(4):
             if i == 3 and (self.data.nodes[grid.id[i]-1].bc == 1 and self.data.nodes[grid.id[0]-1].bc == 1):
                 self.sides.append([self.data.nodes[grid.id[i]-1].getPoint(), self.data.nodes[grid.id[0]-1].getPoint()])
@@ -54,7 +53,7 @@ class HbcSolver():
                     for l in range(self.uni_ele.npc):
                         tem[l].append(GlobalData.GlobalData.alpha *N[l][j]*N[l][k]*Parameters.Parameters(self.uni_ele.npc).wages[l])
 
-                for l in range(self.uni_ele.npc): #obliczanie wektora P
+                for l in range(self.uni_ele.npc): #obliczanie wektora P PRZENIESC DO OSOBNEJ FUNKCJI
                     grid.P[j] += GlobalData.GlobalData.alpha * GlobalData.GlobalData.temperature * N[l][j] * Parameters.Parameters(self.uni_ele.npc).wages[l] * detJ
 
                 if self.uni_ele.npc == 2:
