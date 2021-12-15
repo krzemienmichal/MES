@@ -1,5 +1,8 @@
-import Element
+import Agregation
+import Element4_2D
+import GlobalData
 import Grid
+import HbcMatrix
 
 
 class Jacobian:
@@ -11,7 +14,7 @@ class Jacobian:
     #     self.element = Element.Element4_2D(npc)
     #     self.grid = Grid.Grid()
 
-    def solveJacobian(self, i, j, grid, element: Element.Element4_2D):
+    def solveJacobian(self, i, j, grid, element: Element4_2D.Element4_2D):
         self.jacobian = [[0 for _ in range(2)] for _ in range(2)]
         for n in range(4):
             # self.jacobian[0][0] += grid[n][0] * element.dNdE[j][n] #this 4 lines are saved for now because they are important for my FEM course
@@ -44,13 +47,13 @@ class HMatrix:
     dNdXT = []
     dNdYT = []
 
-    def __init__(self, npc):
+    def __init__(self):
         self.dNdX = [0 for _ in range(4)]
         self.dNdY = [0 for _ in range(4)]
         self.dNdXT = [[0] for _ in range(4)]
         self.dNdYT = [[0] for _ in range(4)]
 
-    def count_h_matrix(self, j, jacobianInverse, element: Element.Element4_2D):
+    def count_h_matrix(self, j, jacobianInverse, element: Element4_2D.Element4_2D):
         for i in range(4):
             self.dNdX[i] = jacobianInverse[0][0] * element.dNdE[j][i] + jacobianInverse[0][1] * element.dNdN[j][i]
             self.dNdY[i] = jacobianInverse[1][0] * element.dNdE[j][i] + jacobianInverse[1][1] * element.dNdN[j][i]
@@ -60,13 +63,13 @@ class HMatrix:
             self.dNdXT[i][0] = self.dNdX[i]
             self.dNdYT[i][0] = self.dNdY[i]
 
-    def solve_H_matrix(self, matrix, element:Element.Element4_2D, k):
+    def solve_H_matrix(self, matrix, element:Element4_2D.Element4_2D, jakobian, k):
         self.matrix_transpose()
         temp2 = []
         for i in range(4):
             tmp = []
             for j in range(4):
-                temp = 30 * (hmatrix.dNdX[i] * hmatrix.dNdXT[j][0] + hmatrix.dNdY[i] * hmatrix.dNdYT[j][
+                temp = GlobalData.GlobalData.conductivity * (self.dNdX[i] * self.dNdXT[j][0] + self.dNdY[i] * self.dNdYT[j][
                     0]) * element.wages[k] * jakobian.detJ
                 tmp.append(temp)
             temp2.append(tmp)
@@ -77,28 +80,17 @@ class HMatrix:
         return matrix
 
 
+class Cmatrix:
+
+    def solveCmatrix(self, matrix, element:Element4_2D.Element4_2D, jacobian, k):
+        for i in range(4):
+            for j in range(4):
+                matrix[i][j] += GlobalData.GlobalData.specific_heat * GlobalData.GlobalData.density * element.N[k][i] * \
+                                element.N[k][j] * element.wages[k] * jacobian.detJ
+        return matrix
+
+
 if __name__ == "__main__":
+    pass
 
-    npc = 2
 
-    # grid = [[0, 0], [0.025, 0], [0.025, 0.025], [0, 0.025]]
-    grid = Grid.Grid()
-    element = Element.Element4_2D(npc)
-    # for i in range(len(grid)):
-    jakobian = Jacobian()
-    hmatrix = HMatrix(npc)
-    # H = [[0 for _ in range(4)] for _ in range(4)]
-    for i in range(grid.nE):
-        print(grid.elements[i].id[0])
-        grid.elements[i].H = [[0 for _ in range(4)]for _ in range(4)]
-        for j in range(pow(element.npc, 2)):
-            jakobian.solveJacobian(0, j, grid, element)
-            hmatrix.count_h_matrix(j, jakobian.jacobianInverse, element)
-            print(jakobian.jacobian)
-            grid.elements[i].H = hmatrix.solve_H_matrix(grid.elements[i].H, element, j)
-
-            # H = hmatrix.solve_H_matrix(H)
-        print()
-        for item in grid.elements[i].H:
-            print(item)
-        print()

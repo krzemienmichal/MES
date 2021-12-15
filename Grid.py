@@ -1,3 +1,7 @@
+import math
+import numbers
+
+
 class Node:
     x = None
     y = None
@@ -8,31 +12,47 @@ class Node:
         self.y = y
         self.bc = bc
 
+    def getPoint(self):
+        return  [self.x, self.y]
+
 
 class Element:
     id = []
     H = []
     Hbc = []
+    P = []
+    C = []
+    SummedMatrix = []
 
     def __init__(self, ids):
         self.id = ids
         self.Hbc = [[0 for _ in range(4)] for _ in range(4)]
+        self.P = [0 for _ in range(4)]
+        self.C = [[0 for _ in range(4)] for _ in range(4)]
+        self.H = [[0 for _ in range(4)] for _ in range(4)]
+        self.SummedMatrix = [[] for _ in range(4)]
 
     def getID(self):
-        return  self.id
+        return self.id
 
 
 class Grid:
-    h = 0.5
-    b = 0.1
-    nH = 3
-    nB = 4
-    nN = nH*nB
-    nE = (nH-1)*(nB-1)
+    h = None
+    b = None
+    nH = None
+    nB = None
+    nN = None
+    nE = None
     nodes = []
     elements = []
 
-    def __init__(self):
+    def __init__(self, h: float, b: float, nH: int, nB: int):
+        self.h = h
+        self.b = b
+        self.nH = nH
+        self.nB = nB
+        self.nN = nH*nB
+        self.nE = (nH-1)*(nB-1)
         self.nodes = [Node(x=i*(self.b/(self.nB-1)), y=j*self.h/(self.nH-1))
                       for i in range(self.nB) for j in range(self.nH)]
         self.generate_elements()
@@ -48,9 +68,10 @@ class Grid:
 
     def set_boundary_conditions(self):
         for node in self.nodes:
-            if (node.x == 0.0 or node.y == 0.0 or node.x == (self.nB-1)*(self.b/(self.nB-1)) or
-                    node.y == (self.nH-1)*(self.h/(self.nH-1))):
+            if (node.x == 0.0 or node.y == 0.0 or math.isclose(node.x, self.b) or
+                    math.isclose(node.y, self.h)):
                 node.bc = 1
+
 
     def print_nodes(self):
         for i in range(self.nN):
