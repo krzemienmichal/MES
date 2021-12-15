@@ -3,7 +3,7 @@ import GlobalData
 import Grid
 import HbcMatrix
 import Agregation
-from Matrixes import Jacobian, HMatrix, Cmatrix
+from Matrixes import Matrixes, HMatrix, Cmatrix
 import numpy as np
 
 
@@ -22,7 +22,7 @@ class Solution:
         self.npc = npc
         self.grid = grid
         self.element = Element4_2D.Element4_2D(npc)
-        self.jacobian = Jacobian()
+        self.jacobian = Matrixes()
         self.h_matrix = HMatrix()
         self.c_matrix = Cmatrix()
 
@@ -63,4 +63,6 @@ if __name__ == "__main__":
     grid = Grid.Grid(0.1, 0.1, 4, 4)
     solution = Solution(npc, grid)
     solution.solveProblem()
+    for h in solution.aggregatedH:
+        print(h)
 

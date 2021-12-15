@@ -14,17 +14,19 @@ class Element4_2D:
         self.npc = npc
         self.dNdE = [[0 for _ in range(4)] for _ in range(pow(npc, 2))]
         self.dNdN = [[0 for _ in range(4)] for _ in range(pow(npc, 2))]
-        self.points = [[0 for _ in range(2)] for _ in range(pow(npc, 2))]
-        self.borderPoints = [[[0 for _ in range(2)] for _ in range(npc)] for _ in range(4)]
+        self.points = [[0 for _ in range(2)] for _ in range(pow(npc, 2))] #derivative points in square fem element
+        self.borderPoints = [[[0 for _ in range(2)] for _ in range(npc)] for _ in range(4)] #derivative points on side of square fem element
         self.N = [[0 for _ in range(4)] for _ in range(pow(npc,2))]
-
         param = Parameters(npc)
+
         for i in range(npc):
             for j in range(npc):
                 self.points[i * npc + j][0] = param.points[j]
                 self.points[i * npc + j][1] = param.points[i]
                 self.wages.append(param.wages[j]*param.wages[i]) #
+
         self.countNmatrix(self.N, self.points)
+
         for i in range(4):
             for j in range(npc):
                 if i == 0:
