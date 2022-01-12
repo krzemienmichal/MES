@@ -40,21 +40,23 @@ class HbcSolver():
     def solveHbc(self, grid:Grid.Grid.elements):
         self.sides = []
         self.defineSides(grid)
+        # print(self.sides)
         for i in range(4):
             N = [[0 for _ in range(4)] for _ in range(self.uni_ele.npc)]
             self.uni_ele.countNmatrix(N, self.uni_ele.borderPoints[i])
             if self.sides[i]:
                 detJ = self.countDetJ(self.sides[i][0],self.sides[i][1])
+                # print(detJ)
             else:
                 detJ = 0.0
             for j in range(4):
                 tem = [[] for _ in range(self.uni_ele.npc)]
                 for k in range(4):
                     for l in range(self.uni_ele.npc):
-                        tem[l].append(GlobalData.GlobalData.alpha *N[l][j]*N[l][k]*Parameters.Parameters(self.uni_ele.npc).wages[l])
+                        tem[l].append(GlobalData.alpha *N[l][j]*N[l][k]*Parameters.Parameters(self.uni_ele.npc).wages[l])
 
                 for l in range(self.uni_ele.npc): #obliczanie wektora P PRZENIESC DO OSOBNEJ FUNKCJI
-                    grid.P[j] += GlobalData.GlobalData.alpha * GlobalData.GlobalData.temperature * N[l][j] * Parameters.Parameters(self.uni_ele.npc).wages[l] * detJ
+                    grid.P[j] += GlobalData.alpha * GlobalData.temperature * N[l][j] * Parameters.Parameters(self.uni_ele.npc).wages[l] * detJ
 
                 if self.uni_ele.npc == 2:
                     for a,b,z in zip(tem[0],tem[1], range(4)):
@@ -76,10 +78,10 @@ if __name__ == "__main__":
         # for matrix in data.elements[i].Hbc:
         #     print(matrix)
         # print()
-        for hbc in data.elements[i].Hbc:
-            print(hbc)
-        print()
-        print(data.elements[i].P)
-        print()
+        # for hbc in data.elements[i].Hbc:
+        #     print(hbc)
+        # print()
+        # print(data.elements[i].P)
+        # print()
 
 

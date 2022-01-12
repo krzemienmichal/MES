@@ -19,8 +19,8 @@ class Matrixes:
             self.jacobian[1][0] += grid.nodes[grid.elements[i].id[n]-1].x * element.dNdN[j][n]
             self.jacobian[1][1] += grid.nodes[grid.elements[i].id[n]-1].y * element.dNdN[j][n]
 
-        self.detJ = self.jacobian[0][0] * self.jacobian[1][1] - self.jacobian[0][1] * self.jacobian[1][0]
-        det = 1 / self.detJ
+        self.detJ = abs(self.jacobian[0][0] * self.jacobian[1][1] - self.jacobian[0][1] * self.jacobian[1][0])
+        det = abs(1 / self.detJ)
         a = [1, 0]
         for n in range(2):
             for m in range(2):
@@ -67,19 +67,17 @@ class HMatrix:
 
         for i in range(4):
             for j in range(4):
-                matrix[i][j] += GlobalData.GlobalData.conductivity * (self.dNdX[i] * self.dNdX[j] + self.dNdY[i] *
+                matrix[i][j] += GlobalData.conductivity * (self.dNdX[i] * self.dNdX[j] + self.dNdY[i] *
                                                                       self.dNdY[j]) * element.wages[k] * jakobian.detJ
         return matrix
 
 
 class Cmatrix:
-
     def solveCmatrix(self, matrix, element:Element4_2D.Element4_2D, jacobian, k):
         for i in range(4):
             for j in range(4):
-                matrix[i][j] += GlobalData.GlobalData.specific_heat * GlobalData.GlobalData.density * element.N[k][i] * \
+                matrix[i][j] += GlobalData.specific_heat * GlobalData.density * element.N[k][i] * \
                                 element.N[k][j] * element.wages[k] * jacobian.detJ
-        return matrix
 
 
 if __name__ == "__main__":

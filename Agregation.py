@@ -1,5 +1,3 @@
-import copy
-
 import GlobalData
 import Grid
 
@@ -18,8 +16,9 @@ class Agregation:
                 for k in range(4):
                     H[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1] += grid.elements[i].SummedMatrix[j][k]
                     C[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1] += grid.elements[i].C[j][k]
-                    Summed[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1] = H[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1]+C[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1]/GlobalData.GlobalData.simultaion_step_time
-
+                    Summed[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1] = \
+                        H[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1]+\
+                        C[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1]/GlobalData.simultaion_step_time
         return H ,C ,Summed
 
 
@@ -31,7 +30,7 @@ class Agregation:
 
         for i in range(grid.nN):
             for j in range(grid.nN):
-                P[i] += aggregatedCmatrix[i][j]/GlobalData.GlobalData.simultaion_step_time * tempVector[j]
+                P[i] += aggregatedCmatrix[i][j]/GlobalData.simultaion_step_time * tempVector[j]
         return P
 
 

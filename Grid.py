@@ -58,6 +58,16 @@ class Grid:
         self.generate_elements()
         self.set_boundary_conditions()
 
+    def load_from_file(self,nodes_number:int, elements_number:int, nodes:list, elements:list, boundary_condition:list ):
+        self.nN = nodes_number
+        self.nE = elements_number
+        self.nodes = [Node(x, y) for x,y in nodes]
+        for el in elements:
+            self.elements.append(Element(el))
+        for bc in boundary_condition:
+            self.nodes[bc-1].bc = 1
+        return self
+
     def generate_elements(self):
         remainder = 0
         for item in range(1, self.nE+1):
