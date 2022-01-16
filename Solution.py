@@ -50,7 +50,7 @@ class Solution:
             self.grid.elements[i].H = [[0 for _ in range(4)] for _ in range(4)]
             self.grid.elements[i].C = [[0 for _ in range(4)] for _ in range(4)]
             for j in range(pow(self.element.npc, 2)):
-                self.jacobian.solveJacobian(0, j, self.grid, self.element)
+                self.jacobian.solveJacobian(i, j, self.grid, self.element)
                 self.h_matrix.count_h_matrix(j, self.jacobian.jacobianInverse, self.element)
                 self.h_matrix.solve_H_matrix(self.grid.elements[i].H, self.element, self.jacobian, j)
                 self.c_matrix.solveCmatrix(self.grid.elements[i].C, self.element, self.jacobian, j)
