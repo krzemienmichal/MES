@@ -15,6 +15,16 @@ class Parameters:
             self.npc = 3
             self.points = [-math.sqrt(3/5), 0, math.sqrt(3/5)]
             self.wages = [5/9, 8/9, 5/9]
+        if npc == 4:
+            self.npc = 4
+            self.points = [-(math.sqrt(3/7 + 2/7 * math.sqrt(6/5))),
+                           -(math.sqrt(3/7 - 2/7 * math.sqrt(6/5))),
+                           math.sqrt(3/7 - 2/7 * math.sqrt(6/5)),
+                           math.sqrt(3/7 + 2/7 * math.sqrt(6/5))]
+            self.wages = [(18-math.sqrt(30))/36,
+                          (18+math.sqrt(30))/36,
+                          (18+math.sqrt(30))/36,
+                          (18-math.sqrt(30))/36]
 
 
 def calc1d(schema: Parameters):

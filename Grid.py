@@ -33,7 +33,7 @@ class Element:
         self.SummedMatrix = [[] for _ in range(4)]
 
     def getID(self):
-        return self.id
+        return [(x-1) for x in self.id]
 
 
 class Grid:
@@ -58,15 +58,15 @@ class Grid:
         self.generate_elements()
         self.set_boundary_conditions()
 
-    def load_from_file(self,nodes_number:int, elements_number:int, nodes:list, elements:list, boundary_condition:list ):
+    def load_from_file(self,nodes_number: int, elements_number: int, nodes: list, elements: list, boundary_condition: list):
         self.nN = nodes_number
         self.nE = elements_number
-        self.nodes = [Node(x, y) for x,y in nodes]
+        self.nodes = [Node(x, y) for x, y in nodes]
+        self.elements = []
         for el in elements:
             self.elements.append(Element(el))
         for bc in boundary_condition:
             self.nodes[bc-1].bc = 1
-        return self
 
     def generate_elements(self):
         remainder = 0
@@ -82,10 +82,11 @@ class Grid:
                     math.isclose(node.y, self.h)):
                 node.bc = 1
 
-
     def print_nodes(self):
         for i in range(self.nN):
-            print(f"{self.nodes[i].x} ,{self.nodes[i].y}, {self.nodes[i].bc}")
+            # print(f"{self.nodes[i].x} ,{self.nodes[i].y}, {self.nodes[i].bc}")
+            if self.nodes[i].bc == 1:
+                print(f"{i} {self.nodes[i].bc}")
 
     def print_elements(self):
         for i in range(self.nE):
