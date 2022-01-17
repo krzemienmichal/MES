@@ -1,11 +1,14 @@
 import Element4_2D
 import GlobalData
 import Grid
-import HbcMatrix
+import BoundaryConditions
 import Agregation
-from Matrixes import Matrixes, HMatrix, Cmatrix
+from Matrices import TransformationJacobian, HMatrix, CMatrix
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+import matplotlib.collections
+import matplotlib.tri as tri
 
 
 class Solution:
@@ -19,20 +22,23 @@ class Solution:
     jacobian= None
     h_matrix = None
     c_matrix = None
+
     def __init__(self, npc, grid):
         self.npc = npc
         self.grid = grid
         self.element = Element4_2D.Element4_2D(npc)
-        self.jacobian = Matrixes()
+        self.jacobian = TransformationJacobian()
         self.h_matrix = HMatrix()
-        self.c_matrix = Cmatrix()
+        self.c_matrix = CMatrix()
 
-    def solveProblem(self):
+    def solve_problem(self):
         solve = None
-        self.solveMatrixes()
+        self.solve_matrices()
         agg = Agregation.Agregation()
         agg.sumHwithHbc(self.grid)
         iterations = int(GlobalData.simulation_time/GlobalData.simultaion_step_time)
+
+        print()
         print(f"it {iterations}")
         for i in range(iterations):
             self.aggregatedH, self.aggregatedC, self.aggregatedSum = agg.aggregateMatrix(grid=self.grid)
@@ -45,22 +51,90 @@ class Solution:
             solve = np.linalg.solve(self.aggregatedSum, self.aggregatedP)
             print(f"\033[38;5;160m {i} \033[38;5;51m \t min: {min(solve): .5f}\t \033[38;5;200m max: {max(solve): .5f} \033[0m")
 
-    def solveMatrixes(self):
+        self.plot_fem_mesh(np.array([self.grid.nodes[x].getPoint() for x in range(self.grid.nN)]),
+                          np.array([self.grid.elements[x].getID() for x in range(self.grid.nE)]),
+                          solve)
+
+    def solve_matrices(self):
+        a = BoundaryConditions.BoundaryConditionSolver(self.grid, self.element)
         for i in range(self.grid.nE):
             self.grid.elements[i].H = [[0 for _ in range(4)] for _ in range(4)]
             self.grid.elements[i].C = [[0 for _ in range(4)] for _ in range(4)]
             for j in range(pow(self.element.npc, 2)):
-                self.jacobian.solveJacobian(0, j, self.grid, self.element)
-                self.h_matrix.count_h_matrix(j, self.jacobian.jacobianInverse, self.element)
-                self.h_matrix.solve_H_matrix(self.grid.elements[i].H, self.element, self.jacobian, j)
-                self.c_matrix.solveCmatrix(self.grid.elements[i].C, self.element, self.jacobian, j)
-        a = HbcMatrix.HbcSolver(self.grid, self.npc)
-        for i in range(self.grid.nE):
-            a.solveHbc(self.grid.elements[i])
+                self.jacobian.solveJacobian(i, j, self.grid, self.element)
+                self.h_matrix.count_h_matrix(j, self.jacobian.jacobian_inverse, self.element)
+                self.h_matrix.solve_h_matrix(self.grid.elements[i].H, self.element, self.jacobian, j)
+                self.c_matrix.solve_c_matrix(self.grid.elements[i].C, self.element, self.jacobian, j)
+            a.solve_hbc_matrix(self.grid.elements[i])
+            a.solve_p_vector(self.grid.elements[i])
+
+    # def showMeshPlot(self ,nodes, elements, values):
+    #     print(nodes)
+    #     print(elements)
+    #     y = nodes[:, 0]
+    #     z = nodes[:, 1]
+    #
+    #     def quatplot(y, z, quatrangles, values, ax=None, **kwargs):
+    #         if not ax: ax = plt.gca()
+    #         yz = np.c_[y, z]
+    #         verts = yz[quatrangles]
+    #         pc = matplotlib.collections.PolyCollection(verts, **kwargs)
+    #         pc.set_array(values)
+    #         ax.add_collection(pc)
+    #         ax.autoscale()
+    #         return pc
+    #
+    #     fig, ax = plt.subplots()
+    #     ax.set_aspect('equal')
+    #
+    #     pc = quatplot(y, z, np.asarray(elements), values, ax=ax,
+    #                   edgecolor="black", linewidth=0.1, cmap="rainbow")
+    #     fig.colorbar(pc, ax=ax)
+    #     ax.plot(y, z, linewidth=0.01, marker="o",markersize=0.1, ls="", color="black")
+    #
+    #     ax.set(title='This is the plot for: quad', xlabel='Y Axis', ylabel='Z Axis')
+    #
+    #     plt.show()
+
+    def quads_to_tris(self, quads):
+        tris = [[None for _ in range(3)] for _ in range(2 * len(quads))]
+        for i in range(len(quads)):
+            j = 2 * i
+            n0 = quads[i][0]
+            n1 = quads[i][1]
+            n2 = quads[i][2]
+            n3 = quads[i][3]
+            tris[j][0] = n0
+            tris[j][1] = n1
+            tris[j][2] = n2
+            tris[j + 1][0] = n2
+            tris[j + 1][1] = n3
+            tris[j + 1][2] = n0
+        return tris
+
+    # plots a finite element mesh
+    def plot_fem_mesh(self, nodes, elements, nodal_values):
+        for element in elements:
+            x = [nodes[element[i]-1][0] for i in range(len(element))]
+            y = [nodes[element[i]-1][1] for i in range(len(element))]
+            plt.fill(x, y, edgecolor='black', fill=False)
+
+    # convert all elements into triangles
+        elements_all_tris = self.quads_to_tris(elements)
+
+        # create an unstructured triangular grid instance
+        triangulation = tri.Triangulation(nodes[:, 0], nodes[:, 1], elements_all_tris)
+
+        # plot the contours
+        plt.tricontourf(triangulation, nodal_values, cmap="rainbow")
+
+        # show
+        plt.colorbar()
+        plt.axis('equal')
+        plt.show()
 
 
 def dataLoader(file):
-    global a
     nodes_points = []
     elements_ids = []
     boundary_condition = []
@@ -99,34 +173,28 @@ def dataLoader(file):
     for i in range(len(boundary_condition)):
         boundary_condition[i] = int(boundary_condition[i].rstrip(","))
     for i in range(len(nodes_points)):
-        x,y = nodes_points[i]
+        x, y = nodes_points[i]
         nodes_points[i] = [float(x.rstrip(",")),float(y.rstrip(","))]
 
-    print(len(elements_ids))
     for i in range(len(elements_ids)):
         temp = []
-        for id in elements_ids[i]:
-            temp.append(int(id.rstrip(",")))
+        for index in elements_ids[i]:
+            temp.append(int(index.rstrip(",")))
         elements_ids[i] = temp
-
-    return Grid.Grid.load_from_file(Grid.Grid,nN, nE, nodes_points, elements_ids, boundary_condition)
+    _grid = Grid.Grid(0.1,0.1,4,4)
+    _grid.load_from_file(nN, nE, nodes_points, elements_ids, boundary_condition)
+    return _grid
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    npc = 2
-    grid = dataLoader("Test2_4_4_MixGrid.txt")
+    npc = 4
+    grid = dataLoader("Test1_4_4.txt")
     GlobalData.printGlobalData()
     solution = Solution(npc, grid)
-    # solution.grid.print_elements(grid)
-    # solution.grid.print_nodes(grid)
-    print(solution.grid.nE)
-    print(solution.grid.nN)
-    # solution.dataLoader("Test1_4_4.txt")
+    # print(solution.grid.nE)
+    # print(solution.grid.nN)
+    solution.solve_problem()
     # solution.grid.print_nodes()
-    # print()
-    # print()
-    # solution.grid.print_elements()
-    solution.solveProblem()
     print(f"{time.time()-start_time} s")
 

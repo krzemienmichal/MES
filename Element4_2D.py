@@ -25,7 +25,7 @@ class Element4_2D:
                 self.points[i * npc + j][1] = param.points[i]
                 self.wages.append(param.wages[j]*param.wages[i]) #
 
-        self.countNmatrix(self.N, self.points)
+        self.count_Nmatrix(self.N, self.points)
 
         for i in range(4):
             for j in range(npc):
@@ -53,15 +53,13 @@ class Element4_2D:
             self.dNdN[i][2] = 0.25 * (1 + self.points[i][0])
             self.dNdN[i][3] = 0.25 * (1 - self.points[i][0])
 
-
-
-    def countNmatrix(self, N, points):
+    @staticmethod
+    def count_Nmatrix(N, points):
         for i in range(len(N)):
             N[i][0] = 0.25*(1-points[i][0])*(1-points[i][1])
             N[i][1] = 0.25*(1+points[i][0])*(1-points[i][1])
             N[i][2] = 0.25*(1+points[i][0])*(1+points[i][1])
             N[i][3] = 0.25*(1-points[i][0])*(1+points[i][1])
-
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-SimulationTime 20
+SimulationTime 60
 SimulationStepTime 1
 K 25
 Alfa 300
