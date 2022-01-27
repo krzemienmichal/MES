@@ -1,4 +1,4 @@
-import Agregation
+import Aggregation
 import Element4_2D
 import GlobalData
 import Grid
@@ -44,21 +44,31 @@ class HMatrix:
             self.dNdX[i] = jacobian_inverse[0][0] * element.dNdE[j][i] + jacobian_inverse[0][1] * element.dNdN[j][i]
             self.dNdY[i] = jacobian_inverse[1][0] * element.dNdE[j][i] + jacobian_inverse[1][1] * element.dNdN[j][i]
 
-    def solve_h_matrix(self, matrix, element : Element4_2D.Element4_2D, jakobian, k): #k is element number in fem grid
+    def solve_h_matrix(self, grid_element: Grid.Element, element : Element4_2D.Element4_2D, jakobian, k): #k is element number in fem grid
         for i in range(4):
             for j in range(4):
-                matrix[i][j] += GlobalData.conductivity * (self.dNdX[i] * self.dNdX[j] + self.dNdY[i] *
-                                                                      self.dNdY[j]) * element.wages[k] * jakobian.detJ
+                if grid_element.Conductivity:
+                    grid_element.H[i][j] += grid_element.Conductivity * (self.dNdX[i] * self.dNdX[j] + self.dNdY[i] *
+                                                           self.dNdY[j]) * element.wages[k] * jakobian.detJ
+                else:
+                    grid_element.H[i][j] += GlobalData.CONDUCTIVITY * (self.dNdX[i] * self.dNdX[j] + self.dNdY[i] *
+                                                                       self.dNdY[j]) * element.wages[k] * jakobian.detJ
+
         # return matrix
 
 
 class CMatrix:
 
-    def solve_c_matrix(self, matrix, element:Element4_2D.Element4_2D, jacobian: TransformationJacobian, k):
+    def solve_c_matrix(self, grid_element: Grid.Element, element:Element4_2D.Element4_2D,
+                       jacobian: TransformationJacobian, k):
         for i in range(4):
             for j in range(4):
-                matrix[i][j] += GlobalData.specific_heat * GlobalData.density * element.N[k][i] * \
+                if grid_element.SpecificHeat:
+                    grid_element.C[i][j] += grid_element.SpecificHeat * grid_element.Density * element.N[k][i] * \
                                 element.N[k][j] * element.wages[k] * jacobian.detJ
+                else:
+                    grid_element.C[i][j] += GlobalData.SPECIFIC_HEAT * GlobalData.DENSITY * element.N[k][i] * \
+                                            element.N[k][j] * element.wages[k] * jacobian.detJ
 
 
 if __name__ == "__main__":

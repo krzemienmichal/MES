@@ -1,5 +1,6 @@
 from Parameters import Parameters
 
+
 # noinspection PyTypeChecker
 class Element4_2D:
     dNdE = []
@@ -25,7 +26,7 @@ class Element4_2D:
                 self.points[i * npc + j][1] = param.points[i]
                 self.wages.append(param.wages[j]*param.wages[i]) #
 
-        self.count_Nmatrix(self.N, self.points)
+        self.count_n_matrix(self.N, self.points)
 
         for i in range(4):
             for j in range(npc):
@@ -54,7 +55,7 @@ class Element4_2D:
             self.dNdN[i][3] = 0.25 * (1 - self.points[i][0])
 
     @staticmethod
-    def count_Nmatrix(N, points):
+    def count_n_matrix(N, points):
         for i in range(len(N)):
             N[i][0] = 0.25*(1-points[i][0])*(1-points[i][1])
             N[i][1] = 0.25*(1+points[i][0])*(1-points[i][1])
@@ -63,15 +64,15 @@ class Element4_2D:
 
 
 if __name__ == "__main__":
-    # npc = 2
+    # npc = 3
     # a = Element4_2D(npc)
-    # # for k in range(pow(npc,2)):
-    # #     print(a.dNdE[k])
-    # # print()
-    # # for k in range(pow(npc,2)):
-    # #     print(a.dNdN[k])
+    # for k in range(pow(npc, 2)):
+    #     print(a.dNdE[k])
+    # print()
+    # for k in range(pow(npc, 2)):
+    #     print(a.dNdN[k])
     # for bp in a.borderPoints:
-    #     print(bp)
+        # print(bp)
     #
     # print()
     # for N in a.N:

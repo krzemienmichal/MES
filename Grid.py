@@ -1,5 +1,4 @@
 import math
-import numbers
 
 
 class Node:
@@ -23,14 +22,23 @@ class Element:
     P = []
     C = []
     SummedMatrix = []
+    Conductivity = None
+    Density = None
+    SpecificHeat = None
+    Alpha = None
 
-    def __init__(self, ids):
+    def __init__(self, ids, data: list = None):
         self.id = ids
         self.Hbc = [[0 for _ in range(4)] for _ in range(4)]
         self.P = [0 for _ in range(4)]
         self.C = [[0 for _ in range(4)] for _ in range(4)]
         self.H = [[0 for _ in range(4)] for _ in range(4)]
         self.SummedMatrix = [[] for _ in range(4)]
+        if data:
+            self.Alpha = data[0]
+            self.Conductivity = data[1]
+            self.Density = data[2]
+            self.SpecificHeat = data[3]
 
     def getID(self):
         return [(x-1) for x in self.id]
@@ -58,15 +66,29 @@ class Grid:
         self.generate_elements()
         self.set_boundary_conditions()
 
-    def load_from_file(self,nodes_number: int, elements_number: int, nodes: list, elements: list, boundary_condition: list):
+    def load_from_file_with_data(self,nodes_number: int, elements_number: int, nodes: list, elements: list, boundary_condition: list,
+                       el_data: list):
+        self.nN = nodes_number
+        self.nE = elements_number
+        self.nodes = [Node(x, y) for x, y in nodes]
+        self.elements = []
+        for el, _data in zip(elements,el_data):
+            self.elements.append(Element(el, _data))
+
+        for bc in boundary_condition:
+            self.nodes[bc-1].bc = 1
+
+    def load_from_file(self, nodes_number: int, elements_number: int, nodes: list, elements: list,
+                       boundary_condition: list):
         self.nN = nodes_number
         self.nE = elements_number
         self.nodes = [Node(x, y) for x, y in nodes]
         self.elements = []
         for el in elements:
             self.elements.append(Element(el))
+
         for bc in boundary_condition:
-            self.nodes[bc-1].bc = 1
+            self.nodes[bc - 1].bc = 1
 
     def generate_elements(self):
         remainder = 0
@@ -84,14 +106,15 @@ class Grid:
 
     def print_nodes(self):
         for i in range(self.nN):
-            # print(f"{self.nodes[i].x} ,{self.nodes[i].y}, {self.nodes[i].bc}")
+            print(f"{i+1}, {self.nodes[i].x}, {self.nodes[i].y}")
+        bc_list = []
+        for i in range(self.nN):
             if self.nodes[i].bc == 1:
-                print(f"{i} {self.nodes[i].bc}")
-
+                bc_list.append(i+1)
+        print(bc_list)
     def print_elements(self):
         for i in range(self.nE):
-            # nodes = self.nodes[self.elements[i].getID()]
-            print(self.elements[i].getID())
+            print(f"{i+1}, {self.elements[i].id[0]}, {self.elements[i].id[1]}, {self.elements[i].id[2]}, {self.elements[i].id[3]}")
 
 
 if __name__ == '__main__':

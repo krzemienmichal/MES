@@ -2,13 +2,12 @@ import GlobalData
 import Grid
 
 
-class Agregation:
+class Aggregation:
     # agregacja H
 
-    def aggregateMatrix(self, grid):
+    def aggregate_matrices(self, grid):
         H = [[0 for _ in range(grid.nN)] for _ in range(grid.nN)]
         C = [[0 for _ in range(grid.nN)] for _ in range(grid.nN)]
-
 
         Summed = [[0 for _ in range(grid.nN)] for _ in range(grid.nN)]
         for i in range(0, grid.nE):
@@ -18,11 +17,10 @@ class Agregation:
                     C[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1] += grid.elements[i].C[j][k]
                     Summed[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1] = \
                         H[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1]+\
-                        C[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1]/GlobalData.simultaion_step_time
-        return H ,C ,Summed
+                        C[grid.elements[i].id[j]-1][grid.elements[i].id[k]-1]/GlobalData.SIMULATION_STEP_TIME
+        return H, C, Summed
 
-
-    def aggregatePvector(self,grid:Grid.Grid, aggregatedCmatrix: list, tempVector : list):
+    def aggregate_p_vector(self, grid:Grid.Grid, aggregated_c_matrix: list, temp_vector : list):
         P = [0 for _ in range(grid.nN)]
         for i in range(0, grid.nE):
             for j in range(4):
@@ -30,16 +28,15 @@ class Agregation:
 
         for i in range(grid.nN):
             for j in range(grid.nN):
-                P[i] += aggregatedCmatrix[i][j]/GlobalData.simultaion_step_time * tempVector[j]
+                P[i] += aggregated_c_matrix[i][j] / GlobalData.SIMULATION_STEP_TIME * temp_vector[j]
         return P
 
-
-
-    def sumHwithHbc(self, grid):
+    def sum_H_with_Hbc(self, grid):
         for i  in range(grid.nE):
             for H, Hbc, j in zip(grid.elements[i].H, grid.elements[i].Hbc, range(4)):
                 for x, y in zip(H, Hbc):
                     grid.elements[i].SummedMatrix[j].append(x+y)
+
 
 if __name__ == "__main__":
     pass

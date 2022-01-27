@@ -1,9 +1,9 @@
-SimulationTime 60
+SimulationTime 20
 SimulationStepTime 1
 K 25
 Alfa 300
-Tot 1200
-InitialTemp 100
+Tot 100
+InitialTemp 1200
 Density 7800
 SpecificHeat 700
 Nodes number 961
